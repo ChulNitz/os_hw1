@@ -18,6 +18,9 @@ int main(int argc, char *argv[]){
         fgets(input_cmd, MAX_CMD_LEN, stdin);
         printf("%s", input_cmd);
 
+        // removing '\n' from input_cmd
+        
+        input_cmd[strcspn(input_cmd, "\n")] = '\0';
         if (!strcmp(input_cmd, "exit")){
             return 1;
             // go to exit fuction
