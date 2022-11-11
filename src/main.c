@@ -26,6 +26,16 @@ int main(int argc, char *argv[]){
             // go to exit fuction
             // break;
         }
+
+        if //something
+
+        execute_internal();
+
+        else
+        excecute_external();
+
+
+
     
     }
     return 0;
