@@ -2,41 +2,85 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+//#include "handleInternal.h"
+//#include "handleExternal.h"
 
 //defines
 #define TRUE 1
-#define MAX_CMD_LEN 255
+#define MAX_INPUT_LEN 255
+#define MAX_CMD_LEN 100
+
+//handle external
+void system_call_err(char* sys_call){
+printf("hw1shell: %s failed, errno is", sys_call); //TODO find errno
+}
+
+int execute_external(char **args){
+  pid_t pid;
+  int status;
+
+  pid = fork();
+  if (pid == 0) {
+    // Child process
+    if (execvp(args[0], args) == -1) {
+       system_call_err("exec");
+    }
+  } else if (pid < 0) {
+    // Error forking
+    system_call_err("fork");
+  } else {
+    // Parent process
+    wait(NULL);
+  }
+
+  return 1;
+}
 
 // main
 int main(int argc, char *argv[]){
 
-    char input_cmd[MAX_CMD_LEN];
+    char user_input[MAX_CMD_LEN];
+    char *cmd_name;
+    char *cmd_params;
+    char internal_cmds[][MAX_CMD_LEN] = {"cd", "exit", "jobs"};
+    int len_int = sizeof(internal_cmds)/MAX_CMD_LEN;
+    int i;
+ 
+
 
     while (TRUE){
 
-        printf("hw1shell$ ");
-        fgets(input_cmd, MAX_CMD_LEN, stdin);
-        printf("%s", input_cmd);
+        char *cmd_args[MAX_CMD_LEN] = {"\0"};
+        int int_cmd_match =0;
 
-        // removing '\n' from input_cmd
-        
-        input_cmd[strcspn(input_cmd, "\n")] = '\0';
-        if (!strcmp(input_cmd, "exit")){
-            return 1;
-            // go to exit fuction
-            // break;
+        printf("hw1shell$ ");
+        fgets(user_input, MAX_INPUT_LEN, stdin);
+
+
+        //extracting the command and parameters
+        cmd_name = strtok(user_input, " ");
+        cmd_params = strtok(NULL, "\n");
+
+        for (i=0; i<len_int; ++i){
+            if (!strcmp(cmd_name, internal_cmds[i])){
+                int_cmd_match=1;
+                // execute_internal();
+            }
         }
 
-        if //something
+        if (int_cmd_match == 1){
+            continue;
+        }
 
-        execute_internal();
-
-        else
-        excecute_external();
-
-
-
-    
+        else {
+            cmd_args[0] = cmd_name;
+            cmd_args[1] = cmd_params;
+            cmd_args[2] = NULL;
+            execute_external(cmd_args);
+        }
+   
     }
     return 0;
 }
