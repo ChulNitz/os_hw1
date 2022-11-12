@@ -5,44 +5,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
-//#include "handleInternal.h"
+#include "handleInternal.h"
 #include "handleExternal.h"
+#include "generalFunctions.h"
 
 //defines
 #define TRUE 1
 #define MAX_INPUT_LEN 255
 #define MAX_CMD_LEN 100
 
-/*
-//handle external
-int system_call_err(char* sys_call){
-printf("hw1shell: %s failed, errno is %d\n", sys_call, errno); //TODO find errno
-return -1;
-}
-
-
-int execute_external(char **args){
-  pid_t pid;
-  int status;
-
-  pid = fork();
-  if (pid == 0) {
-    // Child process
-    if (execvp(args[0], args) == -1) {
-       system_call_err("exec");
-       return -1;
-    }
-  } else if (pid < 0) {
-    // Error forking
-    system_call_err("fork");
-    return -1;
-  } else {
-    // Parent process
-    wait(NULL);
-  }
-
-  return 1;
-}*/
 
 // main
 int main(int argc, char *argv[]){
@@ -50,7 +21,7 @@ int main(int argc, char *argv[]){
     char user_input[MAX_CMD_LEN];
     char *cmd_name;
     char *cmd_params;
-    char internal_cmds[][MAX_CMD_LEN] = {"cd", "exit", "jobs"};
+    char internal_cmds[][MAX_CMD_LEN] = {"cd", "jobs", "exit"};
     int len_int = sizeof(internal_cmds)/MAX_CMD_LEN;
     int i;
     int return_value = 0;
@@ -59,35 +30,37 @@ int main(int argc, char *argv[]){
 
     while (TRUE){
 
-        char *cmd_args[MAX_CMD_LEN] = {"\0"};
+        char **cmd_args;
         int int_cmd_match =0;
 
         printf("hw1shell$ ");
         fgets(user_input, MAX_INPUT_LEN, stdin);
 
 
-        //extracting the command and parameters
-        cmd_name = strtok(user_input, " \n");
-        cmd_params = strtok(NULL, "\n");
+        //parsing command, cmd_args[0] is the command name
+        cmd_args = split_cmd_line (user_input);
 
+        //TODO add background cmd logic
+
+        //check if the cmd is internal
         for (i=0; i<len_int; ++i){
-            if (!strcmp(cmd_name, internal_cmds[i])){
-                int_cmd_match=1;
-                // execute_internal();
+            if (!strcmp(cmd_args[0], internal_cmds[i])){
+                int_cmd_match= 1;
+                return_value= execute_internal(cmd_args, i);
             }
         }
 
-        if (int_cmd_match == 1){
+        //if the cmd was internal - startover loop
+        if (int_cmd_match == 1){ //TODO should reap all child process before new loop
             continue;
         }
 
+        //external cmd handling
         else {
-            cmd_args[0] = cmd_name;
-            cmd_args[1] = cmd_params;
-            cmd_args[2] = NULL;
-            return_value = execute_external(cmd_args);
+            return_value= execute_external(cmd_args);
         }
-   
-    }
+
+        free(cmd_args); //TODO remove if malloc in generalFunctions is removed
+       }
     return return_value;
 }

@@ -1,13 +1,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdio.h>
+
 #include "handleExternal.h"
-
-int system_call_err(char* sys_call){
-printf("hw1shell: %s failed, errno is %d\n", sys_call, errno); 
-return -1;
-}
-
+#include "generalFunctions.h"
 
 int execute_external(char **args){
   pid_t pid;
@@ -28,7 +25,7 @@ int execute_external(char **args){
   } 
   else {
     // Parent process
-    wait(NULL);
+    waitpid(pid, &status, 0);
   }
 
   return 1;
