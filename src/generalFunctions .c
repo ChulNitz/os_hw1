@@ -30,6 +30,22 @@ char **split_cmd_line (char* input_cmd){
 
 //handling error in system call
 int system_call_err(char* sys_call){
-printf("hw1shell: %s failed, errno is %d\n", sys_call, errno); 
+printf("hw1shell: %s failed. errno: %d\n", sys_call, errno); 
 return -1;
+}
+
+void add_child(child_process* child_list, pid_t pid, char* raw_cmd, int* current_childs_count){
+    child_list[*current_childs_count].pid = pid;
+    strcpy(child_list[*current_childs_count].user_cmd, raw_cmd);
+    *current_childs_count += 1;
+}
+
+void remove_child(child_process* child_list, pid_t pid, int* current_childs_count){
+    for (int i=0; i<*current_childs_count; ++i){
+        if (child_list[i].pid == pid){
+            child_list[i].pid = 0;
+            child_list[i].user_cmd[0] = '\0';
+            *current_childs_count -= 1;
+        }
+    }
 }

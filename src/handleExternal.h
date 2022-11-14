@@ -1,8 +1,10 @@
-#ifndef HANDLE_EXTERNAL
-#define HANDLE_EXTERNAL
+#ifndef HANDLE_EXTERNAL_H
+#define HANDLE_EXTERNAL_H
+
+#include "shellDefs.h"
 
 int system_call_err(char* sys_call);
-int execute_external(char **args);
+void execute_external(char **args, child_process* child_list, char *raw_command, int* current_childs_count);
 
 
 #endif

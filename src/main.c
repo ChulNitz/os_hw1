@@ -12,11 +12,11 @@
 
 // global variables
 char user_input[INPUT_BUFFER_LEN+1];
+char raw_input[INPUT_BUFFER_LEN+1];
 char *cmd_name;
 char *cmd_params;
 char **cmd_args;
 const char internal_cmds[NUM_INTERNAL_CMDS][MAX_CMD_LEN] = {"cd", "jobs", "exit"};
-
 
 
 void get_input(char *pUser_input){
@@ -25,15 +25,16 @@ void get_input(char *pUser_input){
 
 void run_shell(){
 
-    
+    child_process child_list[MAX_CHILDS] = {0};
+    int current_childs_count = 0;
+
     while (TRUE){
 
         int is_internal = 0;
         
         printf("hw1shell$ ");
-        get_input(&user_input);
-
-        //parsing command, cmd_args[0] is the command name
+        get_input(user_input);
+        strcpy(raw_input, user_input);
         cmd_args = split_cmd_line (user_input);
 
         //TODO add background cmd logic
@@ -52,16 +53,31 @@ void run_shell(){
         }
 
         else {
-            
-            execute_external(cmd_args);
+            execute_external(cmd_args, child_list, raw_input, &current_childs_count);
         }
 
         free(cmd_args); //TODO remove if malloc in generalFunctions is removed
+
+        // check if child processes are done
+        for (int i=0; i<current_childs_count; ++i){
+            if (child_list[i].pid != 0){
+                int status;
+                pid_t pid = waitpid(child_list[i].pid, &status, WNOHANG);
+                if (pid == -1){
+                    system_call_err("waitpid");
+                }
+                else if (pid == 0){
+                    continue;
+                }
+                else {
+                    printf("hw1shell: process %d exited with status %d", pid, status);
+                    remove_child(child_list, pid, &current_childs_count);
+                }
+            }
+        }
+
     }
 }
-
-
-
 int main(int argc, char *argv[]){
 
     run_shell();
