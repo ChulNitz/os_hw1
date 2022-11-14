@@ -59,8 +59,8 @@ void execute_internal(char **cmd_args, int cmd_index, child_process *child_list,
         case 0:
             execute_cd (cmd_args[1]);
             break;
-
-        case 1: //TODO jobs
+            
+        case 1:
             execute_jobs(child_list, current_childs_count);
             break;
 
@@ -68,7 +68,7 @@ void execute_internal(char **cmd_args, int cmd_index, child_process *child_list,
             execute_exit();
             break;
 
-        default: //TODO exit
+        default:
             break;
     }
     return;

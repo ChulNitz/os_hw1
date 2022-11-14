@@ -1,0 +1,8 @@
+{
+    "configurations": [
+        {
+            "includePath": ["${workspaceFolder}/**", "${workspaceFolder}/include/**"],
+        }
+    ],
+    "version": 4
+}
