@@ -6,6 +6,7 @@
         "generalfunctions.h": "c",
         "shelldefs.h": "c",
         "handleinternal.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "cstdlib": "c"
     }
 }

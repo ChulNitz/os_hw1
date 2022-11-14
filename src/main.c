@@ -32,52 +32,48 @@ void run_shell(){
 
         int is_internal = 0;
         
-        printf("hw1shell$ ");
+        printf("hw1shell$: ");
         get_input(user_input);
+
+        // check if the user entered an empty line
+        if (user_input[0] == '\n'){
+            continue;
+        }
+
         strcpy(raw_input, user_input);
         cmd_args = split_cmd_line (user_input);
 
-        //TODO add background cmd logic
+        // check if the cmn was exit -  if so, exit the shell and free all the allocated memory
+        if (strcmp(cmd_args[0], internal_cmds[2]) == 0){
+            free(cmd_args);
+            execute_exit(child_list, &current_childs_count);
+        }
 
-        //check if the cmd is internal
-        
         for (int i=0; i<NUM_INTERNAL_CMDS; ++i){
             if (!strcmp(cmd_args[0], internal_cmds[i])){
-                execute_internal(cmd_args, i);
+                execute_internal(cmd_args, i, child_list, &current_childs_count);
                 is_internal = 1;
             }
         }
 
-        if (is_internal){ //TODO should reap all child process before new loop
-            continue;
+        if (is_internal){
+            free(cmd_args);
+            continue; // finish the loop
         }
 
         else {
             execute_external(cmd_args, child_list, raw_input, &current_childs_count);
         }
 
-        free(cmd_args); //TODO remove if malloc in generalFunctions is removed
-
         // check if child processes are done
-        for (int i=0; i<current_childs_count; ++i){
-            if (child_list[i].pid != 0){
-                int status;
-                pid_t pid = waitpid(child_list[i].pid, &status, WNOHANG);
-                if (pid == -1){
-                    system_call_err("waitpid");
-                }
-                else if (pid == 0){
-                    continue;
-                }
-                else {
-                    printf("hw1shell: process %d exited with status %d", pid, status);
-                    remove_child(child_list, pid, &current_childs_count);
-                }
-            }
-        }
+        is_any_child_finished(child_list, &current_childs_count);
 
+        free(cmd_args); //TODO remove if malloc in generalFunctions is removed
+        memset(user_input, 0, INPUT_BUFFER_LEN);
+        memset(raw_input, 0, INPUT_BUFFER_LEN);
     }
 }
+
 int main(int argc, char *argv[]){
 
     run_shell();
