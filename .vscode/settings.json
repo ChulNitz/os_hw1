@@ -3,6 +3,9 @@
         "string.h": "c",
         "types.h": "c",
         "stdio.h": "c",
-        "generalfunctions.h": "c"
+        "generalfunctions.h": "c",
+        "shelldefs.h": "c",
+        "handleinternal.h": "c",
+        "wait.h": "c"
     }
 }

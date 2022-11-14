@@ -8,34 +8,30 @@
 #include "handleInternal.h"
 #include "handleExternal.h"
 #include "generalFunctions.h"
+#include "shellDefs.h"
 
-//defines
-#define TRUE 1
-#define MAX_INPUT_LEN 255
-#define MAX_CMD_LEN 100
-
-
-// main
-int main(int argc, char *argv[]){
-
-    char user_input[MAX_CMD_LEN];
-    char *cmd_name;
-    char *cmd_params;
-    char internal_cmds[][MAX_CMD_LEN] = {"cd", "jobs", "exit"};
-    int len_int = sizeof(internal_cmds)/MAX_CMD_LEN;
-    int i;
-    int return_value = 0;
- 
+// global variables
+char user_input[INPUT_BUFFER_LEN+1];
+char *cmd_name;
+char *cmd_params;
+char **cmd_args;
+const char internal_cmds[NUM_INTERNAL_CMDS][MAX_CMD_LEN] = {"cd", "jobs", "exit"};
 
 
+
+void get_input(char *pUser_input){
+    fgets(pUser_input, INPUT_BUFFER_LEN, stdin);
+}
+
+void run_shell(){
+
+    
     while (TRUE){
 
-        char **cmd_args;
-        int int_cmd_match =0;
-
+        int is_internal = 0;
+        
         printf("hw1shell$ ");
-        fgets(user_input, MAX_INPUT_LEN, stdin);
-
+        get_input(&user_input);
 
         //parsing command, cmd_args[0] is the command name
         cmd_args = split_cmd_line (user_input);
@@ -43,24 +39,31 @@ int main(int argc, char *argv[]){
         //TODO add background cmd logic
 
         //check if the cmd is internal
-        for (i=0; i<len_int; ++i){
+        
+        for (int i=0; i<NUM_INTERNAL_CMDS; ++i){
             if (!strcmp(cmd_args[0], internal_cmds[i])){
-                int_cmd_match= 1;
-                return_value= execute_internal(cmd_args, i);
+                execute_internal(cmd_args, i);
+                is_internal = 1;
             }
         }
 
-        //if the cmd was internal - startover loop
-        if (int_cmd_match == 1){ //TODO should reap all child process before new loop
+        if (is_internal){ //TODO should reap all child process before new loop
             continue;
         }
 
-        //external cmd handling
         else {
-            return_value= execute_external(cmd_args);
+            
+            execute_external(cmd_args);
         }
 
         free(cmd_args); //TODO remove if malloc in generalFunctions is removed
-       }
-    return return_value;
+    }
+}
+
+
+
+int main(int argc, char *argv[]){
+
+    run_shell();
+    return 0;
 }

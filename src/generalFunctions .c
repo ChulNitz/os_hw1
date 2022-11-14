@@ -4,12 +4,12 @@
 #include <errno.h>
 #include <unistd.h>
 #include "generalFunctions.h"
+#include "shellDefs.h"
 
 //parsing command line input
 char **split_cmd_line (char* input_cmd){
-    int bufsize = 60;  //TODO decide on size
     int index = 0;
-    char **tokens = malloc(bufsize * sizeof(char*)); //TODO re-think  malloc
+    char **tokens = malloc(INPUT_BUFFER_LEN * sizeof(char*)); //TODO re-think malloc
     char *token;
 
     if (!tokens) { 

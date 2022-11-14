@@ -2,11 +2,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <errno.h>
-
 #include "handleInternal.h"
 #include "generalFunctions.h"
 
-int execute_cd(char *dest_dir)
+void execute_cd(char *dest_dir)
 {
 
   if (dest_dir == NULL) {
@@ -17,28 +16,28 @@ int execute_cd(char *dest_dir)
      
     }
   }
-  return 1;
+  return;
 }
 
-int execute_jobs(char *cmd_params)
+void execute_jobs(char *cmd_params)
 {
 
-  return 1;
+  return;
 }
 
-int execute_exit()
+void execute_exit()
 {
 
-  return 1;
+  return;
 }
 
 
-int execute_internal(char **cmd_args, int cmd_index){
-  int return_val= 0;
+void execute_internal(char **cmd_args, int cmd_index){
+
     switch(cmd_index)
     {
         case 0:
-            return_val = execute_cd (cmd_args[1]);
+            execute_cd (cmd_args[1]);
             break;
 
         case 1: //TODO jobs
@@ -51,6 +50,5 @@ int execute_internal(char **cmd_args, int cmd_index){
         default: //TODO exit
             break;
     }
-
-    return return_val;
+    return;
 }
