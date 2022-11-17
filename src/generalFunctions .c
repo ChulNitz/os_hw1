@@ -30,7 +30,7 @@ char **split_cmd_line (char* input_cmd){
 
 //handling error in system call
 int system_call_err(char* sys_call){
-printf("hw1shell$: %s failed. errno: %d\n", sys_call, errno); 
+printf("hw1shell: %s failed, errno is %d\n", sys_call, errno); 
 return -1;
 }
 

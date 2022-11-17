@@ -10,8 +10,8 @@
 void is_any_child_finished(child_process* child_list, int* current_childs_count){
     int status;
     pid_t pid;
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0){
-        printf("hw1shell$: child %d finished with status %d\n", pid, status);
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0){ //TODO handle error of waitpid
+        printf("hw1shell: pid %d finished\n", pid);
         remove_child(child_list, pid, current_childs_count);
         
         // need to move all children to the left of the list
@@ -23,7 +23,7 @@ void is_any_child_finished(child_process* child_list, int* current_childs_count)
                 child_list[i+1].user_cmd[0] = '\0';
             }
         }
-    }
+    } 
 }
 
 
@@ -48,7 +48,7 @@ void execute_external(char **args, child_process *child_list, char *raw_command,
 
   if (is_background && (*current_childs_count) == 4)
   {
-    printf("hw1shell$: cannot run more than 4 background jobs\n");
+    printf(" hw1shell: too many background commands running\n");
     return;
   }
 
@@ -58,6 +58,7 @@ void execute_external(char **args, child_process *child_list, char *raw_command,
     // Child process
     if (execvp(args[0], args) == -1)
     {
+      printf("hw1shell: invalid command\n");
       system_call_err("exec");
       return;
     }
@@ -72,7 +73,7 @@ void execute_external(char **args, child_process *child_list, char *raw_command,
   { // parent process
     if (is_background)
     {
-      printf("hw1shell$: new background pid is %d\n", pid);
+      printf("hw1shell: pid %d started\n", pid);
       add_child(child_list, pid, raw_command, current_childs_count);
       return;
     }

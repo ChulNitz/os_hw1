@@ -9,7 +9,8 @@
                 "-g",
                 "${fileDirname}/*.c",
                 "-o",
-                "${fileDirname}/build/hwShell"
+                "${fileDirname}/build/hwShell",
+                "--include-directory=${fileDirname}/../include/"
             ],
             "options": {
                 "cwd": "${fileDirname}"
