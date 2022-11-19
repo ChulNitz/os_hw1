@@ -36,14 +36,23 @@ void execute_jobs(child_process *child_list, int *current_childs_count)
 }
 
 
-void execute_exit()
+void execute_exit(int* current_childs_count)
 {
   // wait for all the background jobs to finish
+  // catch is pid is -1
   int status;
   pid_t pid;
-  while ((pid = waitpid(-1, &status, 0)) > 0)
+  while (*current_childs_count > 0)
   {
-    printf("hw1shell: pid %d finished\n", pid);
+    pid = waitpid(-1, &status, 0);
+    if(pid == -1){ //error
+    system_call_err("waitpid");
+    }
+    else
+    {
+      printf("hw1shell: pid %d finished\n", pid);
+      *current_childs_count -= 1;
+    } 
   }
   // exit the shell
   exit(0);
@@ -55,17 +64,11 @@ void execute_internal(char **cmd_args, int cmd_index, child_process *child_list,
     switch(cmd_index)
     {
         case 0:
-            execute_cd (cmd_args[1]);
+            execute_cd(cmd_args[1]);
             break;
-            
         case 1:
             execute_jobs(child_list, current_childs_count);
             break;
-
-        case 2:
-            execute_exit();
-            break;
-
         default:
             break;
     }

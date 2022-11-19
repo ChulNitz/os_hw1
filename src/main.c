@@ -46,7 +46,7 @@ void run_shell(){
         // check if the cmn was exit -  if so, exit the shell and free all the allocated memory
         if (strcmp(cmd_args[0], internal_cmds[2]) == 0){
             free(cmd_args);
-            execute_exit(child_list, &current_childs_count);
+            execute_exit(&current_childs_count);
         }
 
         for (int i=0; i<NUM_INTERNAL_CMDS; ++i){
@@ -75,7 +75,6 @@ void run_shell(){
 }
 
 int main(int argc, char *argv[]){
-
     run_shell();
     return 0;
 }

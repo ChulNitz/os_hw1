@@ -10,18 +10,17 @@
 void is_any_child_finished(child_process* child_list, int* current_childs_count){
     int status;
     pid_t pid;
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0){ //TODO handle error of waitpid
-        printf("hw1shell: pid %d finished\n", pid);
-        remove_child(child_list, pid, current_childs_count);
-        
-        // need to move all children to the left of the list
-        for (int i=0; i<*current_childs_count; ++i){
-            if (child_list[i].pid == 0){
-                child_list[i].pid = child_list[i+1].pid;
-                strcpy(child_list[i].user_cmd, child_list[i+1].user_cmd);
-                child_list[i+1].pid = 0;
-                child_list[i+1].user_cmd[0] = '\0';
-            }
+    while (*current_childs_count > 0){
+        pid = waitpid(-1, &status, WNOHANG);
+        if (pid == -1){ //error
+            system_call_err("waitpid");
+        }
+        else if (pid == 0){ //no child finished
+            break;
+        }
+        else{ //child finished
+            printf("hw1shell: pid %d finished\n", pid);
+            remove_child(child_list, pid, current_childs_count);
         }
     } 
 }

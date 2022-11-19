@@ -48,4 +48,14 @@ void remove_child(child_process* child_list, pid_t pid, int* current_childs_coun
             *current_childs_count -= 1;
         }
     }
+
+// need to move all children to the left of the list
+    for (int i=0; i<*current_childs_count; ++i){
+        if (child_list[i].pid == 0){
+            child_list[i].pid = child_list[i+1].pid;
+            strcpy(child_list[i].user_cmd, child_list[i+1].user_cmd);
+            child_list[i+1].pid = 0;
+            child_list[i+1].user_cmd[0] = '\0';
+        }
+    }
 }
