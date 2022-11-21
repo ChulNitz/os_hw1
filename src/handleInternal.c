@@ -35,7 +35,6 @@ void execute_jobs(child_process *child_list, int *current_childs_count)
   }
 }
 
-
 void execute_exit(int* current_childs_count)
 {
   // wait for all the background jobs to finish
@@ -57,7 +56,6 @@ void execute_exit(int* current_childs_count)
   // exit the shell
   exit(0);
 }
-
 
 void execute_internal(char **cmd_args, int cmd_index, child_process *child_list, int *current_childs_count){
 

@@ -35,7 +35,7 @@ void run_shell(){
         printf("hw1shell$: ");
         get_input(user_input);
 
-        // check if the user entered an empty line
+        // ignore an empty line
         if (user_input[0] == '\n'){
             continue;
         }
@@ -43,7 +43,7 @@ void run_shell(){
         strcpy(raw_input, user_input);
         cmd_args = split_cmd_line (user_input);
 
-        // check if the cmn was exit -  if so, exit the shell and free all the allocated memory
+        // check if the cmd was exit -  if so, exit the shell and free all the allocated memory
         if (strcmp(cmd_args[0], internal_cmds[2]) == 0){
             free(cmd_args);
             execute_exit(&current_childs_count);
@@ -68,7 +68,7 @@ void run_shell(){
         // check if child processes are done
         is_any_child_finished(child_list, &current_childs_count);
 
-        free(cmd_args); //TODO remove if malloc in generalFunctions is removed
+        free(cmd_args);
         memset(user_input, 0, INPUT_BUFFER_LEN);
         memset(raw_input, 0, INPUT_BUFFER_LEN);
     }

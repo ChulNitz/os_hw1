@@ -3,13 +3,14 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "generalFunctions.h"
 #include "shellDefs.h"
 
 //parsing command line input
 char **split_cmd_line (char* input_cmd){
     int index = 0;
-    char **tokens = malloc(INPUT_BUFFER_LEN * sizeof(char*)); //TODO re-think malloc
+    char **tokens = malloc(INPUT_BUFFER_LEN * sizeof(char*));
     char *token;
 
     if (!tokens) { 
@@ -58,4 +59,24 @@ void remove_child(child_process* child_list, pid_t pid, int* current_childs_coun
             child_list[i+1].user_cmd[0] = '\0';
         }
     }
+}
+
+void is_any_child_finished(child_process* child_list, int* current_childs_count){
+    int status;
+    pid_t pid;
+    while (*current_childs_count > 0){
+        pid = waitpid(-1, &status, WNOHANG);
+        if (pid == -1){ //error
+            printf("status was %d", status);
+            system_call_err("waitpid");
+
+        }
+        else if (pid == 0){ //no child finished
+            break;
+        }
+        else{ //child finished
+            printf("hw1shell: pid %d finished\n", pid);
+            remove_child(child_list, pid, current_childs_count);
+        }
+    } 
 }

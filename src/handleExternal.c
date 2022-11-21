@@ -3,27 +3,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "handleExternal.h"
 #include "generalFunctions.h"
-
-
-void is_any_child_finished(child_process* child_list, int* current_childs_count){
-    int status;
-    pid_t pid;
-    while (*current_childs_count > 0){
-        pid = waitpid(-1, &status, WNOHANG);
-        if (pid == -1){ //error
-            system_call_err("waitpid");
-        }
-        else if (pid == 0){ //no child finished
-            break;
-        }
-        else{ //child finished
-            printf("hw1shell: pid %d finished\n", pid);
-            remove_child(child_list, pid, current_childs_count);
-        }
-    } 
-}
 
 
 void execute_external(char **args, child_process *child_list, char *raw_command, int *current_childs_count)
@@ -59,7 +41,7 @@ void execute_external(char **args, child_process *child_list, char *raw_command,
     {
       printf("hw1shell: invalid command\n");
       system_call_err("exec");
-      return;
+      exit(1);
     }
   }
   else if (pid < 0)
